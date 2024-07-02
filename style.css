@@ -59,9 +59,6 @@ body {
 	box-shadow: 0 2px 4px 0 rgba(0, 0, 0, .2), 0 25px 50px 0 rgba(0, 0, 0, .1);
 }
 
-.todo__head {
-}
-
 .todo__all-btn{
 	position: absolute;
 	display: none;
@@ -239,9 +236,6 @@ body {
 .todo__count {
 	margin-right: 5px;
 	cursor: default;
-}
-
-.todo__filters {
 }
 
 .todo__filter-btn {
