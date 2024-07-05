@@ -7,6 +7,8 @@ document.addEventListener('DOMContentLoaded', () => {
 	const clearCompletedBtn = document.querySelector('.todo__clear');
 	const footer = document.querySelector('.todo__footer');
 
+	loadItems();
+
 	mainInput.addEventListener('keypress', (e) => {
 		if (e.key === 'Enter' && mainInput.value.trim()) {
 			addNote(mainInput.value.trim());
@@ -49,16 +51,17 @@ document.addEventListener('DOMContentLoaded', () => {
 		updateUI();
 	});
 
-	function addNote(text) {
+	function addNote(text, completed = false, appendToEnd = false) {
 		const noteItem = document.createElement('li');
 		noteItem.className = 'todo__item';
+		if (completed) noteItem.classList.add('_completed');
 		noteItem.innerHTML = `
-			<input type="checkbox" class="todo__checkbox">
+			<input type="checkbox" class="todo__checkbox" ${completed ? 'checked' : ''}>
 			<label class="todo__icon"></label>
 			<div class="todo__text">${text}</div>
 			<span class="todo__del-item">✖</span>
 		`;
-		noteList.children.length ? noteList.insertBefore(noteItem, noteList.children[0]) : noteList.appendChild(noteItem);
+		appendToEnd ? noteList.appendChild(noteItem) : noteList.insertBefore(noteItem, noteList.children[0]);
 
 		const checkbox = noteItem.querySelector('.todo__checkbox');
 		const deleteBtn = noteItem.querySelector('.todo__del-item');
@@ -90,9 +93,9 @@ document.addEventListener('DOMContentLoaded', () => {
 					noteItem.replaceChild(noteText, input);
 					if (input.value.trim() === '') {
 						noteItem.remove();
-						updateUI();
 					}
 					blurFlag = false;
+					updateUI();
 			});
 
 			input.addEventListener('keypress', (e) => {
@@ -102,8 +105,8 @@ document.addEventListener('DOMContentLoaded', () => {
 					noteItem.replaceChild(noteText, input);
 					if (input.value.trim() === '') {
 						noteItem.remove();
-						updateUI();
 					}
+					updateUI();
 				}
 			});
 			input.addEventListener('keydown', (e) => {
@@ -132,6 +135,8 @@ document.addEventListener('DOMContentLoaded', () => {
 			toggleAllBtn.classList.remove('_all');
 		}
 
+		saveItems();
+
 		filterItems(document.querySelector('.todo__filter-btn._active-filter').dataset.filter);
 	}
 
@@ -150,5 +155,21 @@ document.addEventListener('DOMContentLoaded', () => {
 					break;
 			}
 		});
+	}
+
+	function saveItems() {
+		const items = [];
+		document.querySelectorAll('.todo__item').forEach(item => {
+			const text = item.querySelector('.todo__text').textContent;
+			const completed = item.classList.contains('_completed');
+			items.push({ text, completed });
+		});
+		localStorage.setItem('items', JSON.stringify(items));
+	}
+
+	function loadItems() {
+		const items = JSON.parse(localStorage.getItem('items')) || [];
+		items.forEach(item => addNote(item.text, item.completed, true));
+		updateUI();
 	}
 });
