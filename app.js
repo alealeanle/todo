@@ -10,20 +10,20 @@ document.addEventListener('DOMContentLoaded', () => {
 	loadItems();
 
 	mainInput.addEventListener('keypress', (e) => {
-		if (e.key === 'Enter' && mainInput.value.trim()) {
-			addNote(mainInput.value.trim());
-			mainInput.value = '';
-			updateUI();
+		if (e.key === 'Enter') {
+			mainInputHandler();
 		}
 	});
 
-	mainInput.addEventListener('blur', () => {
+	mainInput.addEventListener('blur', mainInputHandler);
+
+	function mainInputHandler () {
 		if (mainInput.value.trim()) {
 			addNote(mainInput.value.trim());
 			mainInput.value = '';
 			updateUI();
 		}
-});
+	};
 
 	toggleAllBtn.addEventListener('click', () => {
 		const items = document.querySelectorAll('.todo__item');
@@ -129,11 +129,7 @@ document.addEventListener('DOMContentLoaded', () => {
 		clearCompletedBtn.style.display = completedItems.length ? 'inline-block' : 'none';
 
 
-		if (items.length && completedItems.length === items.length) {
-			toggleAllBtn.classList.add('_all');
-		} else {
-			toggleAllBtn.classList.remove('_all');
-		}
+		toggleAllBtn.classList.toggle('_all', items.length && completedItems.length === items.length);
 
 		saveItems();
 
