@@ -7,17 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
 	const clearCompletedBtn = document.querySelector('.todo__clear');
 	const footer = document.querySelector('.todo__footer');
 
-	loadItems();
-
-	mainInput.addEventListener('keypress', (e) => {
-		if (e.key === 'Enter') {
-			mainInputHandler();
-		}
-	});
-
-	mainInput.addEventListener('blur', mainInputHandler);
-
-	function mainInputHandler () {
+	const handleMainInput = () => {
 		if (mainInput.value.trim()) {
 			addNote(mainInput.value.trim());
 			mainInput.value = '';
@@ -25,33 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
 		}
 	};
 
-	toggleAllBtn.addEventListener('click', () => {
-		const items = document.querySelectorAll('.todo__item');
-		const shouldCheck = Array.from(items).some(item => !item.classList.contains('_completed'));
-		console.log(Array.from(items));
-		items.forEach(item => {
-			item.classList.toggle('_completed', shouldCheck);
-			item.querySelector('.todo__checkbox').checked = shouldCheck;
-		});
-		console.log(Array.from(items));
-		updateUI();
-	});
-
-	filterButtons.forEach(btn => {
-		btn.addEventListener('click', () => {
-			document.querySelector('.todo__filter-btn._active-filter').classList.remove('_active-filter');
-			btn.classList.add('_active-filter');
-			filterItems(btn.dataset.filter);
-		});
-	});
-
-	clearCompletedBtn.addEventListener('click', () => {
-		const completedItems = document.querySelectorAll('.todo__item._completed');
-		completedItems.forEach(item => item.remove());
-		updateUI();
-	});
-
-	function addNote(text, completed = false, appendToEnd = false) {
+	const addNote = (text, completed = false, appendToEnd = false) => {
 		const noteItem = document.createElement('li');
 		noteItem.className = 'todo__item';
 		if (completed) noteItem.classList.add('_completed');
@@ -118,7 +82,7 @@ document.addEventListener('DOMContentLoaded', () => {
 		});
 	}
 
-	function updateUI() {
+	const updateUI = () => {
 		const items = document.querySelectorAll('.todo__item');
 		const completedItems = document.querySelectorAll('.todo__item._completed');
 		const activeItems = items.length - completedItems.length;
@@ -136,7 +100,7 @@ document.addEventListener('DOMContentLoaded', () => {
 		filterItems(document.querySelector('.todo__filter-btn._active-filter').dataset.filter);
 	}
 
-	function filterItems(filter) {
+	const filterItems = (filter) => {
 		const items = document.querySelectorAll('.todo__item');
 		items.forEach(item => {
 			switch (filter) {
@@ -153,7 +117,7 @@ document.addEventListener('DOMContentLoaded', () => {
 		});
 	}
 
-	function saveItems() {
+	const saveItems = () => {
 		const items = [];
 		document.querySelectorAll('.todo__item').forEach(item => {
 			const text = item.querySelector('.todo__text').textContent;
@@ -163,9 +127,43 @@ document.addEventListener('DOMContentLoaded', () => {
 		localStorage.setItem('items', JSON.stringify(items));
 	}
 
-	function loadItems() {
+	const loadItems = () => {
 		const items = JSON.parse(localStorage.getItem('items')) || [];
 		items.forEach(item => addNote(item.text, item.completed, true));
 		updateUI();
 	}
+
+	loadItems();
+
+	mainInput.addEventListener('keypress', (e) => {
+		if (e.key === 'Enter') {
+			handleMainInput();
+		}
+	});
+
+	mainInput.addEventListener('blur', handleMainInput);
+
+	toggleAllBtn.addEventListener('click', () => {
+		const items = document.querySelectorAll('.todo__item');
+		const shouldCheck = Array.from(items).some(item => !item.classList.contains('_completed'));
+		items.forEach(item => {
+			item.classList.toggle('_completed', shouldCheck);
+			item.querySelector('.todo__checkbox').checked = shouldCheck;
+		});
+		updateUI();
+	});
+
+	filterButtons.forEach(btn => {
+		btn.addEventListener('click', () => {
+			document.querySelector('.todo__filter-btn._active-filter').classList.remove('_active-filter');
+			btn.classList.add('_active-filter');
+			filterItems(btn.dataset.filter);
+		});
+	});
+
+	clearCompletedBtn.addEventListener('click', () => {
+		const completedItems = document.querySelectorAll('.todo__item._completed');
+		completedItems.forEach(item => item.remove());
+		updateUI();
+	});
 });
